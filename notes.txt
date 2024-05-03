@@ -1,1 +1,0 @@
-1. Plik .env zawiera login i hasło używane do logowania na stronę Dostawcy. Ich wartości zostać zmienione, jeśli zajdzie taka potrzeba, jednak zapis nie może ulec modyfikacji
