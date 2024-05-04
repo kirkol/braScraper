@@ -9,6 +9,7 @@ const getProductLinks = require('./utils/getProductLinks');
 const getColourLinks = require('./utils/getColourLinks');
 const getTableData = require('./utils/getTableData');
 const log = require('./utils/log');
+const { resolve } = require('path');
 
 const scrapBras = async () => {
   const start = new Date();
@@ -19,7 +20,11 @@ const scrapBras = async () => {
     return;
   }
   try {
-    browser = await ppt.launch({ headless: true }); // set to true after all checks (only for dev)
+    browser = await ppt.launch({
+      headless: true,
+      executablePath:
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    }); // set to true after all checks (only for dev)
     mainPage = await login(browser);
   } catch (err) {
     log('Err: Something went wrong with browser or login step: ', err);
@@ -29,7 +34,10 @@ const scrapBras = async () => {
   // get category links and write them in a new categoryLinks.json
   try {
     const categoryLinks = await getCategoryLinks(mainPage);
-    await writeFile('./linksData/categoryLinks.json', categoryLinks);
+    await writeFile(
+      resolve(process.cwd(), 'categoryLinks.json'),
+      categoryLinks,
+    );
     log('categoryLinks.json created');
   } catch (err) {
     log('Err: Something went wrong with categoryLinks: ', err);
@@ -39,7 +47,7 @@ const scrapBras = async () => {
   let categoryLinksArr = [];
   try {
     const categoryLinksArrJSON = await readFile(
-      './linksData/categoryLinks.json',
+      resolve(process.cwd(), 'categoryLinks.json'),
     );
     categoryLinksArr = JSON.parse(categoryLinksArrJSON);
     log('categoryLinks.json has been read');
@@ -50,7 +58,10 @@ const scrapBras = async () => {
   // get collection links and write them in a new collectionLinks.json
   try {
     const collectionLinks = await getCollectionLinks(browser, categoryLinksArr);
-    await writeFile('./linksData/collectionLinks.json', collectionLinks);
+    await writeFile(
+      resolve(process.cwd(), 'collectionLinks.json'),
+      collectionLinks,
+    );
     log('collectionLinks.json created');
   } catch (err) {
     log('Err: Something went wrong with collectionLinks: ', err);
@@ -59,7 +70,7 @@ const scrapBras = async () => {
   let collectionLinksArr = [];
   try {
     const collectionLinksArrJSON = await readFile(
-      './linksData/collectionLinks.json',
+      resolve(process.cwd(), 'collectionLinks.json'),
     );
     collectionLinksArr = JSON.parse(collectionLinksArrJSON);
     log('collectionLinks.json has been read');
@@ -70,7 +81,7 @@ const scrapBras = async () => {
   // get product links and write them in a new productLinks.json
   try {
     const productLinks = await getProductLinks(browser, collectionLinksArr);
-    await writeFile('./linksData/productLinks.json', productLinks);
+    await writeFile(resolve(process.cwd(), 'productLinks.json'), productLinks);
     log('productLinks.json created');
   } catch (err) {
     log('Err: Something went wrong with productLinks: ', err);
@@ -78,7 +89,9 @@ const scrapBras = async () => {
   }
   let productLinksArr = [];
   try {
-    const productLinksArrJSON = await readFile('./linksData/productLinks.json');
+    const productLinksArrJSON = await readFile(
+      resolve(process.cwd(), 'productLinks.json'),
+    );
     productLinksArr = JSON.parse(productLinksArrJSON);
     log('productLinks.json has been read');
   } catch (err) {
@@ -88,7 +101,7 @@ const scrapBras = async () => {
   // get colour links and write them in a new colourLinks.json
   try {
     const colourLinks = await getColourLinks(browser, productLinksArr);
-    await writeFile('./linksData/colourLinks.json', colourLinks);
+    await writeFile(resolve(process.cwd(), 'colourLinks.json'), colourLinks);
     log('colourLinks.json created');
   } catch (err) {
     log('Err: Something went wrong with colourLinks: ', err);
@@ -97,12 +110,14 @@ const scrapBras = async () => {
   let colourLinksArr = [];
   let colourLinksNoRep = [];
   try {
-    const colourLinksArrJSON = await readFile('./linksData/colourLinks.json');
+    const colourLinksArrJSON = await readFile(
+      resolve(process.cwd(), 'colourLinks.json'),
+    );
     colourLinksArr = JSON.parse(colourLinksArrJSON);
     log('colourLinks.json has been read');
     colourLinksNoRep = uniqBy(colourLinksArr, 'link'); // remove duplicated links (many links are reachable from many various parentLinks)
     await writeFile(
-      './linksData/colourLinksNoRep.json',
+      resolve(process.cwd(), 'colourLinksNoRep.json'),
       JSON.stringify(colourLinksNoRep),
     );
   } catch (err) {
@@ -112,7 +127,7 @@ const scrapBras = async () => {
   // scrap table data for each colour link
   try {
     const tableData = await getTableData(browser, colourLinksNoRep);
-    await writeFile('./linksData/tableData.json', tableData);
+    await writeFile(resolve(process.cwd(), 'tableData.json'), tableData);
   } catch (err) {
     log('Err: Something went wrong with tableData: ', err);
     return;
@@ -120,13 +135,15 @@ const scrapBras = async () => {
 
   try {
     log('Converting tableData from JSON to CSV format');
-    const tableDataJSON = await readFile('./linksData/tableData.json');
+    const tableDataJSON = await readFile(
+      resolve(process.cwd(), 'tableData.json'),
+    );
     data = JSON.parse(tableDataJSON);
     let tableDataStr = 'Item;State\n';
     data.forEach((obj) => {
       tableDataStr += `${obj.item};${obj.isAvailableState}\n`;
     });
-    await writeFile('./linksData/tableData.csv', tableDataStr);
+    await writeFile(resolve(process.cwd(), 'tableData.csv'), tableDataStr);
   } catch (err) {
     log('Err: Something wrong with converting process from JSON to CSV', err);
   }

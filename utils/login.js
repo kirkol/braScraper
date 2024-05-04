@@ -13,7 +13,7 @@ const login = async (browser) => {
   try {
     page = await browser.newPage();
     await page.setViewport({ width: 1366, height: 768 });
-    await page.goto(cred.loginPage);
+    await page.goto(`${cred.loginPage}`);
   } catch (err) {
     log('Err: ', err); // handle err (write in separate file) LATER
     throw 'Login error';
