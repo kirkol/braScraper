@@ -1,0 +1,9 @@
+Scraper has started at Sat May 04 2024 21:56:48 GMT+0200 (GMT+02:00)...
+Log in accomplished
+STEP 1 OF 5. Found: 24 category links
+categoryLinks.json created
+STEP 2 OF 5. Scrapped 0 of category links. Still remains: 24
+categoryLinks.json has been read
+STEP 2 OF 5. Scrapped 1 of category links. Still remains: 23
+STEP 2 OF 5. Scrapped 2 of category links. Still remains: 22
+STEP 2 OF 5. Scrapped 3 of category links. Still remains: 21
